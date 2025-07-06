@@ -108,7 +108,7 @@ const PerformanceMonitor = () => {
                 dom_parse_time:
                   navigation.domContentLoadedEventEnd - navigation.responseEnd,
                 load_complete_time:
-                  navigation.loadEventEnd - navigation.navigationStart,
+                  navigation.loadEventEnd - navigation.startTime,
               };
 
               console.log("Navigation metrics:", metrics);
