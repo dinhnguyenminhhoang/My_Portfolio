@@ -138,7 +138,7 @@ const Contact: React.FC = () => {
 
       // Contact info animation
       gsap.fromTo(
-        infoRef.current?.children || [],
+        infoRef.current?.children,
         {
           x: 50,
           opacity: 0,

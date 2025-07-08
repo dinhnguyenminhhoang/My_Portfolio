@@ -18,11 +18,9 @@ const Hero = () => {
   const backgroundRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
   const floatingElementsRef = useRef<HTMLDivElement>(null);
+
   const [typedText, setTypedText] = useState("");
   const { scrollToElement } = useOptimizedScroll();
-  const [particles, setParticles] = useState<
-    Array<{ left: string; top: string; delay: string }>
-  >([]);
 
   const fullText = "Nghệ nhân cắm hoa chuyên nghiệp";
   const phrases = [
@@ -30,17 +28,7 @@ const Hero = () => {
     "Nghệ thuật cắm hoa tinh tế",
     "Mang hạnh phúc qua từng bông hoa",
   ];
-  useEffect(() => {
-    setParticles(
-      Array(20)
-        .fill(0)
-        .map(() => ({
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          delay: `${Math.random() * 8}s`,
-        }))
-    );
-  }, []);
+
   useEffect(() => {
     // Typing animation
     let index = 0;
@@ -209,14 +197,14 @@ const Hero = () => {
         ref={particlesRef}
         className="absolute inset-0 overflow-hidden pointer-events-none"
       >
-        {particles.map((particle, i) => (
+        {[...Array(20)].map((_, i) => (
           <div
             key={i}
             className="particle absolute w-2 h-2 bg-rose-300 rounded-full opacity-60"
             style={{
-              left: particle.left,
-              top: particle.top,
-              animationDelay: particle.delay,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 8}s`,
             }}
           />
         ))}

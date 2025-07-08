@@ -263,11 +263,9 @@ export const animations = {
   magnetic: (element: gsap.TweenTarget, options: any = {}) => {
     const strength = options.strength || 0.3;
 
-    if (!(element instanceof HTMLElement)) return;
+    if (!(element instanceof Element)) return;
 
-    const handleMouseMove = (e: Event) => {
-      if (!(e instanceof MouseEvent)) return;
-
+    const handleMouseMove = (e: MouseEvent) => {
       const rect = element.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
@@ -439,7 +437,7 @@ export const animationUtils = {
 
   // Batch animations
   batch: (elements: gsap.TweenTarget, animation: any, options: any = {}) => {
-    return ScrollTrigger.batch(elements as any, {
+    return ScrollTrigger.batch(elements, {
       onEnter: (elements) => animation(elements, options),
       onLeave: options.onLeave,
       onEnterBack: options.onEnterBack,

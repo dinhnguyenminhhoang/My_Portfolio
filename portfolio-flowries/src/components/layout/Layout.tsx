@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import "@/app/globals.css";
-import { SmoothScrollProvider } from "../SmoothScrollProvider";
-import GsapScrollTo from "../GsapScrollTo";
-import CustomCursor from "./CustomCursor";
+import "./globals.css";
+import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,11 +73,17 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body
-        className={`${inter.className} antialiased bg-white text-gray-900 !overflow-x-hidden`}
+        className={`${inter.className} antialiased bg-white text-gray-900 overflow-x-hidden`}
         suppressHydrationWarning
       >
         <SmoothScrollProvider>
-          <CustomCursor />
+          {/* Custom Cursor */}
+          <div
+            id="custom-cursor"
+            className="fixed top-0 left-0 w-4 h-4 bg-rose-500 rounded-full pointer-events-none z-50 mix-blend-difference opacity-0 transition-all duration-300 ease-out"
+            style={{ transform: "translate(-50%, -50%)" }}
+          />
+
           {/* Smooth Scroll Container */}
           <div id="smooth-wrapper">
             <div id="smooth-content">{children}</div>
@@ -218,6 +222,11 @@ export default function RootLayout({
               background: linear-gradient(180deg, #e11d48, #db2777);
             }
 
+            /* Smooth animations for all elements */
+            * {
+              will-change: transform;
+            }
+
             /* Optimize font rendering */
             body {
               -webkit-font-smoothing: antialiased;
@@ -240,7 +249,6 @@ export default function RootLayout({
               }
             }
           `}</style>
-          <GsapScrollTo />
         </SmoothScrollProvider>
       </body>
     </html>
