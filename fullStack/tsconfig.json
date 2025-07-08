@@ -24,22 +24,22 @@
     ],
     "paths": {
       "@/*": [
-        "./src/*"
+        "fullStack/src/*"
       ],
       "@/components/*": [
-        "./src/components/*"
+        "fullStack/src/components/*"
       ],
       "@/lib/*": [
-        "./src/lib/*"
+        "fullStack/src/lib/*"
       ],
       "@/hooks/*": [
-        "./src/hooks/*"
+        "fullStack/src/hooks/*"
       ],
       "@/types/*": [
-        "./src/types/*"
+        "fullStack/src/types/*"
       ],
       "@/animations/*": [
-        "./src/animations/*"
+        "fullStack/src/animations/*"
       ]
     },
     "types": [

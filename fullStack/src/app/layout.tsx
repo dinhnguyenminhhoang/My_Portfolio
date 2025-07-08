@@ -1,9 +1,9 @@
 "use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import ThemeToggle from "@/components/ThemeToggle";
-import PerformanceMonitor from "@/components/PerformanceMonitor";
+import { ThemeProvider } from "../components/ThemeProvider";
+import ThemeToggle from "../components/ThemeToggle";
+import PerformanceMonitor from "../components/PerformanceMonitor";
 import "./globals.css";
 
 const geistSans = Geist({
