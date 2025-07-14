@@ -1,195 +1,252 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  MessageCircle,
-  Briefcase,
-  GraduationCap,
   BookOpen,
   Users,
-  Clock,
-  Star,
-  ArrowRight,
-  CheckCircle,
-  Video,
-  Calendar,
+  Briefcase,
   Globe,
-  Award,
+  Star,
+  Clock,
+  Target,
+  Trophy,
+  CheckCircle,
+  ArrowRight,
   Zap,
-  Shield,
-  HeartHandshake,
-  Sparkles,
+  Heart,
+  Award,
   TrendingUp,
+  MessageCircle,
+  Calendar,
+  Download,
+  Play,
+  Sparkles,
 } from "lucide-react";
-import { cn, fadeInUp, staggerChildren, scrollToSection } from "@/utils/cn";
+import { cn, fadeInUp, staggerChildren } from "@/utils/cn";
+
+// Register GSAP plugins
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const services = [
   {
-    id: "conversation",
+    id: 1,
+    icon: BookOpen,
+    title: "IELTS Preparation",
+    subtitle: "Achieve Your Target Score",
+    description:
+      "Comprehensive IELTS training with proven strategies, mock tests, and personalized feedback to help you achieve your target band score.",
+    features: [
+      "Speaking practice sessions",
+      "Writing task correction",
+      "Mock tests & feedback",
+      "Flexible scheduling",
+      "Proven track record",
+    ],
+    price: 80,
+    duration: "per session",
+    popular: true,
+    color: "from-blue-500 to-blue-600",
+    bgColor: "from-blue-50 to-blue-100",
+    stats: { students: 200, rating: 4.9, success: 95 },
+  },
+  {
+    id: 2,
+    icon: Briefcase,
+    title: "Business English",
+    subtitle: "Professional Communication",
+    description:
+      "Master business communication, presentations, and professional vocabulary to advance your career in international environments.",
+    features: [
+      "Presentation skills",
+      "Business vocabulary",
+      "Email writing",
+      "Meeting participation",
+      "Industry-specific terms",
+    ],
+    price: 75,
+    duration: "per session",
+    popular: false,
+    color: "from-purple-500 to-purple-600",
+    bgColor: "from-purple-50 to-purple-100",
+    stats: { students: 150, rating: 4.8, success: 92 },
+  },
+  {
+    id: 3,
     icon: MessageCircle,
     title: "Conversational English",
     subtitle: "Speak with Confidence",
     description:
-      "Master natural conversation through immersive practice sessions and real-world scenarios.",
+      "Build fluency and confidence in everyday conversations through interactive speaking practice and real-world scenarios.",
     features: [
-      "Daily conversation practice",
-      "Accent reduction training",
-      "Idioms & expressions mastery",
-      "Cultural communication insights",
-      "Fluency building exercises",
+      "Daily conversation topics",
+      "Pronunciation improvement",
+      "Cultural understanding",
+      "Confidence building",
+      "Real-world scenarios",
     ],
-    duration: "60 min",
-    price: "$45",
-    originalPrice: "$55",
-    sessions: "1-on-1",
-    level: "All Levels",
+    price: 65,
+    duration: "per session",
     popular: false,
-    color: "from-blue-500 via-cyan-500 to-teal-500",
-    bgPattern: "conversation",
-  },
-  {
-    id: "business",
-    icon: Briefcase,
-    title: "Business English",
-    subtitle: "Professional Excellence",
-    description:
-      "Elevate your career with advanced business communication skills for the global workplace.",
-    features: [
-      "Executive presentation skills",
-      "Negotiation & persuasion",
-      "Cross-cultural business etiquette",
-      "Industry-specific vocabulary",
-      "Leadership communication",
-    ],
-    duration: "75 min",
-    price: "$65",
-    originalPrice: "$80",
-    sessions: "1-on-1",
-    level: "Intermediate+",
-    popular: true,
-    color: "from-purple-600 via-blue-600 to-indigo-600",
-    bgPattern: "business",
-  },
-  {
-    id: "ielts",
-    icon: GraduationCap,
-    title: "IELTS Mastery",
-    subtitle: "Score 7+ Guaranteed",
-    description:
-      "Comprehensive IELTS preparation with proven strategies and personalized feedback.",
-    features: [
-      "Band 7+ achievement strategies",
-      "Full mock tests with analysis",
-      "Writing task optimization",
-      "Speaking confidence building",
-      "Time management mastery",
-    ],
-    duration: "90 min",
-    price: "$75",
-    originalPrice: "$90",
-    sessions: "1-on-1",
-    level: "Intermediate+",
-    popular: false,
-    color: "from-emerald-500 via-green-500 to-teal-500",
-    bgPattern: "academic",
+    color: "from-green-500 to-green-600",
+    bgColor: "from-green-50 to-green-100",
+    stats: { students: 180, rating: 4.9, success: 88 },
   },
 ];
 
-const premiumFeatures = [
+const achievements = [
   {
-    icon: Video,
-    title: "HD Video Lessons",
-    description: "Crystal clear video quality with interactive whiteboards",
+    icon: Users,
+    value: "500+",
+    label: "Students Taught",
+    description: "Across 25+ countries",
   },
   {
-    icon: Calendar,
-    title: "24/7 Scheduling",
-    description: "Book lessons anytime with our flexible scheduling system",
+    icon: Star,
+    value: "4.9/5",
+    label: "Average Rating",
+    description: "Student satisfaction",
   },
   {
-    icon: Globe,
-    title: "Global Accessibility",
-    description: "Available worldwide with timezone optimization",
-  },
-  {
-    icon: Shield,
-    title: "Progress Guarantee",
-    description: "See improvement in 30 days or get your money back",
+    icon: Trophy,
+    value: "98%",
+    label: "Success Rate",
+    description: "Goal achievement",
   },
   {
     icon: Award,
-    title: "Certified Materials",
-    description: "Premium learning resources from top publishers",
-  },
-  {
-    icon: HeartHandshake,
-    title: "Lifetime Support",
-    description: "Ongoing support even after course completion",
+    value: "8+",
+    label: "Years Experience",
+    description: "Teaching excellence",
   },
 ];
 
-const testimonialHighlights = [
-  {
-    name: "Maria Chen",
-    role: "Software Engineer",
-    rating: 5,
-    quote: "Improved my IELTS score from 6.0 to 8.5 in just 3 months!",
-  },
-  {
-    name: "Ahmed Hassan",
-    role: "Business Manager",
-    rating: 5,
-    quote:
-      "My presentation skills improved dramatically for international meetings.",
-  },
-  {
-    name: "Lisa Park",
-    role: "University Student",
-    rating: 5,
-    quote: "Finally feel confident speaking English in any situation.",
-  },
+const testimonialQuotes = [
+  "Sarah's IELTS course helped me achieve band 8.5!",
+  "Perfect business English training for my career.",
+  "Gained confidence in speaking within 3 months.",
+  "Excellent teaching methods and materials.",
 ];
 
 export default function ServicesSection() {
-  const [activeService, setActiveService] = useState("business");
-  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const [activeService, setActiveService] = useState(1);
+  const [isMounted, setIsMounted] = useState(false);
+
   const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const achievementsRef = useRef<HTMLDivElement>(null);
+
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+  // Fixed positions for particles to avoid hydration mismatch
+  const particlePositions = [
+    { left: 15, top: 20 },
+    { left: 85, top: 25 },
+    { left: 30, top: 70 },
+    { left: 70, top: 15 },
+    { left: 45, top: 85 },
+    { left: 90, top: 55 },
+    { left: 10, top: 60 },
+    { left: 60, top: 35 },
+    { left: 25, top: 45 },
+    { left: 80, top: 75 },
+    { left: 5, top: 30 },
+    { left: 95, top: 80 },
+  ];
 
   useEffect(() => {
-    if (!isInView) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isInView || !isMounted) return;
 
     const ctx = gsap.context(() => {
-      // Staggered card animation
-      const cards = cardsRef.current?.children;
-      if (cards) {
+      // Header animation
+      gsap.fromTo(
+        headerRef.current,
+        {
+          opacity: 0,
+          y: 80,
+          scale: 0.95,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+
+      // Service cards stagger animation
+      const serviceCards = cardsRef.current?.querySelectorAll(".service-card");
+      if (serviceCards) {
         gsap.fromTo(
-          cards,
+          serviceCards,
           {
             opacity: 0,
             y: 100,
-            rotationX: 15,
+            scale: 0.9,
+            rotateX: -15,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+            duration: 1,
+            ease: "power3.out",
+            stagger: 0.2,
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      }
+
+      // Achievement cards animation
+      const achievementCards =
+        achievementsRef.current?.querySelectorAll(".achievement-card");
+      if (achievementCards) {
+        gsap.fromTo(
+          achievementCards,
+          {
+            opacity: 0,
+            y: 60,
             scale: 0.8,
           },
           {
             opacity: 1,
             y: 0,
-            rotationX: 0,
             scale: 1,
-            duration: 1,
-            ease: "power3.out",
-            stagger: 0.2,
+            duration: 0.8,
+            ease: "back.out(1.7)",
+            stagger: 0.15,
+            scrollTrigger: {
+              trigger: achievementsRef.current,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
           }
         );
       }
 
-      // Floating animations
+      // Floating animation for service cards
       gsap.to(".floating-service-card", {
-        y: -8,
-        rotation: 1,
+        y: -10,
         duration: 3,
         ease: "power1.inOut",
         yoyo: true,
@@ -209,60 +266,94 @@ export default function ServicesSection() {
         stagger: 0.3,
       });
 
-      // Premium features reveal
-      gsap.fromTo(
-        ".premium-feature",
-        { opacity: 0, y: 30, scale: 0.9 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          ease: "back.out(1.7)",
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: ".premium-features-container",
-            start: "top 80%",
-          },
-        }
-      );
+      // Magnetic hover effects
+      const magneticElements =
+        sectionRef.current?.querySelectorAll(".magnetic-element");
+      magneticElements?.forEach((element) => {
+        const magnetic = element as HTMLElement;
+
+        magnetic.addEventListener("mouseenter", () => {
+          gsap.to(magnetic, {
+            scale: 1.05,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        });
+
+        magnetic.addEventListener("mouseleave", () => {
+          gsap.to(magnetic, {
+            scale: 1,
+            x: 0,
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        });
+
+        magnetic.addEventListener("mousemove", (e: MouseEvent) => {
+          const rect = magnetic.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          gsap.to(magnetic, {
+            x: x * 0.1,
+            y: y * 0.1,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        });
+      });
+
+      // Parallax background elements
+      gsap.to(".parallax-bg", {
+        yPercent: -30,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [isInView]);
+  }, [isInView, isMounted]);
 
   return (
     <section
       ref={sectionRef}
       id="services"
-      className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800"
+      className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50"
     >
-      {/* Animated Background */}
+      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Gradient Orbs */}
-        <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-gradient-to-r from-purple-400/20 to-blue-400/20 blur-3xl animate-pulse" />
-        <div className="absolute bottom-40 right-20 w-80 h-80 rounded-full bg-gradient-to-r from-blue-400/20 to-cyan-400/20 blur-3xl animate-pulse" />
+        <div className="parallax-bg absolute top-20 left-10 w-96 h-96 rounded-full bg-gradient-to-r from-purple-400/20 to-blue-400/20 blur-3xl" />
+        <div className="parallax-bg absolute bottom-40 right-20 w-80 h-80 rounded-full bg-gradient-to-r from-blue-400/20 to-cyan-400/20 blur-3xl" />
 
         {/* Floating Particles */}
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="particle absolute w-2 h-2 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full opacity-20"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-            }}
-          />
-        ))}
+        {isMounted &&
+          particlePositions.map((position, i) => (
+            <div
+              key={i}
+              className="particle absolute w-2 h-2 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full opacity-20"
+              style={{
+                left: `${position.left}%`,
+                top: `${position.top}%`,
+                animationDelay: `${i * 0.4}s`,
+              }}
+            />
+          ))}
 
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Section Header */}
+        {/* Section Header */}
         <motion.div
+          ref={headerRef}
           initial="initial"
           animate={isInView ? "animate" : "initial"}
           variants={staggerChildren}
@@ -270,84 +361,65 @@ export default function ServicesSection() {
         >
           <motion.div
             variants={fadeInUp}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 text-purple-600 dark:text-purple-400 text-sm font-semibold mb-8 shadow-lg"
+            className="inline-flex items-center px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-blue-200/50 text-blue-600 text-sm font-semibold mb-8 shadow-lg"
           >
-            <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
-            Premium English Coaching
+            <Sparkles className="w-5 h-5 mr-2" />
+            My Services
+            <Zap className="w-4 h-4 ml-2" />
           </motion.div>
 
           <motion.h2
             variants={fadeInUp}
-            className="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white mb-8 leading-tight"
+            className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6"
           >
-            <span className="block">Transform Your</span>
-            <span className="block bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              English Journey
+            Transform Your{" "}
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              English Skills
             </span>
           </motion.h2>
 
           <motion.p
             variants={fadeInUp}
-            className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed"
+            className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
           >
-            Experience world-class English coaching with personalized attention,
-            cutting-edge methodology, and guaranteed results that will
-            accelerate your success.
+            Choose from my specialized programs designed to help you achieve
+            your English learning goals with personalized attention and proven
+            methodologies.
           </motion.p>
         </motion.div>
 
-        {/* Enhanced Services Cards */}
+        {/* Services Cards */}
         <div ref={cardsRef} className="grid lg:grid-cols-3 gap-8 mb-20">
           {services.map((service, index) => (
-            <motion.div
+            <div
               key={service.id}
               className={cn(
-                "floating-service-card group relative cursor-pointer transition-all duration-700 transform-gpu",
+                "service-card floating-service-card group relative cursor-pointer transition-all duration-700 transform-gpu magnetic-element",
                 activeService === service.id
                   ? "scale-105 z-10"
                   : "hover:scale-102"
               )}
-              onHoverStart={() => setActiveService(service.id)}
-              onClick={() => setActiveService(service.id)}
+              onMouseEnter={() => setActiveService(service.id)}
             >
               {/* Popular Badge */}
               {service.popular && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{
-                    delay: index * 0.2 + 0.5,
-                    type: "spring",
-                    bounce: 0.5,
-                  }}
-                  className="absolute -top-4 -right-4 z-20"
-                >
+                <div className="absolute -top-4 -right-4 z-20">
                   <div className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-xl flex items-center gap-1">
                     <Star className="w-3 h-3 fill-current" />
                     Most Popular
                   </div>
-                </motion.div>
+                </div>
               )}
 
               <div
                 className={cn(
                   "relative h-full backdrop-blur-xl rounded-3xl p-8 shadow-2xl border transition-all duration-700 overflow-hidden",
-                  "bg-gradient-to-br from-white/80 via-white/60 to-white/40",
-                  "dark:from-gray-800/80 dark:via-gray-800/60 dark:to-gray-800/40",
+                  "bg-gradient-to-br from-white/90 via-white/70 to-white/50",
                   activeService === service.id
-                    ? "border-purple-300 dark:border-purple-500 shadow-purple-500/30"
-                    : "border-white/50 dark:border-gray-700/50 hover:border-purple-200 dark:hover:border-purple-600"
+                    ? "border-purple-300 shadow-purple-500/30"
+                    : "border-white/50 hover:border-purple-200"
                 )}
               >
-                {/* Animated Background Pattern */}
-                <div
-                  className={cn(
-                    "absolute inset-0 opacity-5 bg-gradient-to-br transition-opacity duration-700",
-                    service.color,
-                    activeService === service.id ? "opacity-10" : ""
-                  )}
-                />
-
                 {/* Service Header */}
                 <div className="relative z-10">
                   <div
@@ -361,258 +433,183 @@ export default function ServicesSection() {
                   </div>
 
                   <div className="mb-6">
-                    <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       {service.title}
                     </h3>
-                    <p className="text-purple-600 dark:text-purple-400 font-bold mb-3 text-lg">
+                    <p className="text-purple-600 font-semibold mb-3 text-lg">
                       {service.subtitle}
                     </p>
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed">
                       {service.description}
                     </p>
                   </div>
 
-                  {/* Enhanced Pricing */}
-                  <div className="bg-gradient-to-r from-gray-50 to-purple-50 dark:from-gray-800 dark:to-purple-900/20 rounded-2xl p-6 mb-6">
+                  {/* Pricing */}
+                  <div
+                    className={cn(
+                      "bg-gradient-to-r rounded-2xl p-6 mb-6",
+                      service.bgColor
+                    )}
+                  >
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-black text-gray-900 dark:text-white">
-                            {service.price}
+                          <span className="text-3xl font-bold text-gray-900">
+                            ${service.price}
                           </span>
-                          <span className="text-lg text-gray-500 line-through">
-                            {service.originalPrice}
+                          <span className="text-gray-600 text-sm">
+                            {service.duration}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500">
-                          per {service.duration} lesson
-                        </p>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                          {service.sessions}
+                        <div className="text-sm text-gray-600 mb-1">
+                          Success Rate
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {service.level}
+                        <div className="text-xl font-bold text-green-600">
+                          {service.stats.success}%
                         </div>
                       </div>
                     </div>
 
-                    {/* Savings Badge */}
-                    <div className="inline-flex items-center px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      Save $
-                      {parseInt(service.originalPrice.slice(1)) -
-                        parseInt(service.price.slice(1))}
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {service.stats.students}+
+                        </div>
+                        <div className="text-xs text-gray-600">Students</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {service.stats.rating}
+                        </div>
+                        <div className="text-xs text-gray-600">Rating</div>
+                      </div>
+                      <div>
+                        <div className="flex justify-center">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className="w-3 h-3 text-yellow-400 fill-current"
+                            />
+                          ))}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          Reviews
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Enhanced Features */}
-                  <div className="mb-8">
-                    <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-yellow-500" />
-                      What You'll Master
-                    </h4>
-                    <ul className="space-y-3">
-                      {service.features.map((feature, idx) => (
-                        <motion.li
-                          key={idx}
-                          className="flex items-start text-sm text-gray-600 dark:text-gray-300"
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.1 }}
-                        >
-                          <CheckCircle className="w-4 h-4 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                          <span>{feature}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
+                  {/* Features */}
+                  <div className="space-y-3 mb-8">
+                    {service.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-gray-700">{feature}</span>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Enhanced CTA */}
-                  <motion.button
-                    onClick={() => scrollToSection("contact")}
-                    className={cn(
-                      "w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-500",
-                      "flex items-center justify-center gap-2 group relative overflow-hidden",
-                      activeService === service.id
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-2xl shadow-purple-500/40"
-                        : "bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30"
-                    )}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="relative z-10">Start Learning Today</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
+                  {/* CTA Buttons */}
+                  <div className="space-y-3">
+                    <button
+                      className={cn(
+                        "w-full py-4 px-6 rounded-2xl font-bold text-white shadow-lg transition-all duration-300",
+                        "bg-gradient-to-r hover:shadow-xl transform hover:scale-105",
+                        service.color
+                      )}
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <Calendar className="w-5 h-5" />
+                        Book Free Trial
+                        <ArrowRight className="w-5 h-5" />
+                      </span>
+                    </button>
 
-                    {/* Button shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  </motion.button>
+                    <button className="w-full py-3 px-6 rounded-2xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2">
+                      <Play className="w-4 h-4" />
+                      Watch Demo
+                    </button>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        {/* Testimonial Highlights */}
-        <motion.div
-          initial="initial"
-          animate={isInView ? "animate" : "initial"}
-          variants={staggerChildren}
-          className="mb-20"
+        {/* Achievements Section */}
+        <div
+          ref={achievementsRef}
+          className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 lg:p-12 shadow-xl border border-white/20 mb-16"
         >
-          <motion.h3
-            variants={fadeInUp}
-            className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12"
-          >
-            Success Stories from My Students
-          </motion.h3>
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center">
+              <Trophy className="w-8 h-8 mr-3 text-yellow-500" />
+              Proven Results
+            </h3>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Numbers that speak for themselves - real results from real
+              students
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonialHighlights.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                variants={fadeInUp}
-                className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+          <div className="grid md:grid-cols-4 gap-8">
+            {achievements.map((achievement, index) => (
+              <div
+                key={achievement.label}
+                className="achievement-card text-center magnetic-element group hover:shadow-lg transition-all duration-300 p-6 rounded-2xl"
               >
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 text-yellow-500 fill-current"
-                    />
-                  ))}
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                  <achievement.icon className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4 italic">
-                  "{testimonial.quote}"
-                </p>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {testimonial.name}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {testimonial.role}
-                  </div>
+                <div className="text-3xl font-bold text-gray-900 mb-2">
+                  {achievement.value}
                 </div>
-              </motion.div>
+                <div className="text-sm font-semibold text-gray-600 mb-1">
+                  {achievement.label}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {achievement.description}
+                </div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Enhanced Premium Features */}
-        <motion.div
-          className="premium-features-container bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden"
-          initial="initial"
-          animate={isInView ? "animate" : "initial"}
-          variants={staggerChildren}
-        >
-          {/* Background Pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-          <motion.div variants={fadeInUp} className="relative z-10">
-            <div className="text-center mb-12">
-              <h3 className="text-4xl font-bold mb-4">
-                Premium Learning Experience
-              </h3>
-              <p className="text-xl text-purple-200 max-w-3xl mx-auto">
-                Every lesson includes these premium features to ensure your
-                success
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {premiumFeatures.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  className="premium-feature text-center group"
-                  onHoverStart={() => setHoveredFeature(index)}
-                  onHoverEnd={() => setHoveredFeature(null)}
+        {/* Testimonial Quotes Slider */}
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 rounded-3xl p-12 text-white shadow-2xl">
+            <Heart className="w-16 h-16 mx-auto mb-6 text-pink-200" />
+            <h3 className="text-3xl font-bold mb-8">What My Students Say</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {testimonialQuotes.map((quote, index) => (
+                <div
+                  key={index}
+                  className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 magnetic-element"
                 >
-                  <motion.div
-                    className="inline-flex p-4 bg-white/10 backdrop-blur-sm rounded-2xl mb-4 group-hover:bg-white/20 transition-all duration-300"
-                    animate={
-                      hoveredFeature === index
-                        ? { scale: 1.1, rotate: 5 }
-                        : { scale: 1, rotate: 0 }
-                    }
-                  >
-                    <feature.icon className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <h4 className="font-bold text-lg mb-2">{feature.title}</h4>
-                  <p className="text-purple-200 text-sm">
-                    {feature.description}
-                  </p>
-                </motion.div>
+                  <p className="text-lg italic mb-4">"{quote}"</p>
+                  <div className="flex justify-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="w-5 h-5 text-yellow-300 fill-current"
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
 
-        {/* Enhanced CTA Section */}
-        <motion.div
-          initial="initial"
-          animate={isInView ? "animate" : "initial"}
-          variants={staggerChildren}
-          className="text-center mt-20"
-        >
-          <motion.div variants={fadeInUp} className="mb-8">
-            <h3 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Ready to{" "}
-              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Master English?
-              </span>
-            </h3>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-              Join hundreds of successful students who have transformed their
-              English skills. Book your free consultation and get a personalized
-              learning plan.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            className="flex flex-col sm:flex-row gap-6 justify-center"
-          >
-            <motion.button
-              onClick={() => scrollToSection("contact")}
-              className="px-10 py-5 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 text-white rounded-2xl font-bold text-xl shadow-2xl hover:shadow-purple-500/40 transition-all duration-500 flex items-center justify-center gap-3 relative overflow-hidden group"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Calendar className="w-6 h-6" />
-              <span>Book Free Consultation</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            </motion.button>
-
-            <motion.button
-              className="px-10 py-5 border-2 border-purple-500 text-purple-500 rounded-2xl font-bold text-xl hover:bg-purple-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-3"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Star className="w-6 h-6" />
-              View Success Stories
-            </motion.button>
-          </motion.div>
-
-          {/* Trust Indicators */}
-          <motion.div
-            variants={fadeInUp}
-            className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500 dark:text-gray-400"
-          >
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-green-500" />
-              <span>30-Day Money Back Guarantee</span>
+            <div className="mt-10">
+              <button className="magnetic-element px-8 py-4 bg-white text-blue-600 rounded-full font-bold hover:shadow-xl transition-all duration-300 flex items-center justify-center mx-auto">
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Read All Reviews
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </button>
             </div>
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-blue-500" />
-              <span>TESOL Certified Instructor</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-500" />
-              <span>4.9/5 Average Rating</span>
-            </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );

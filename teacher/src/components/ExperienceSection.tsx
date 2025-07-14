@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   GraduationCap,
   Briefcase,
@@ -20,8 +21,18 @@ import {
   Zap,
   ChevronRight,
   ExternalLink,
+  Download,
+  CheckCircle,
+  Sparkles,
+  Building,
+  Trophy,
 } from "lucide-react";
 import { cn, fadeInUp, staggerChildren } from "@/utils/cn";
+
+// Register GSAP plugins
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const experiences = [
   {
@@ -87,57 +98,31 @@ const experiences = [
     description:
       "Provided customized English training programs for multinational corporations and government agencies across 15 countries.",
     achievements: [
-      "Trained 200+ executives globally",
-      "Designed corporate training modules",
-      "Improved team communication by 85%",
-      "Established partnerships in Asia-Pacific",
+      "Designed corporate training programs",
+      "Managed international client relationships",
+      "Delivered workshops to 200+ professionals",
+      "Achieved 95% client retention rate",
     ],
     technologies: [
       "Corporate Training",
-      "Cross-cultural Communication",
-      "Program Design",
-      "Remote Teaching",
+      "International Relations",
+      "Program Management",
+      "Cross-cultural Training",
     ],
-    color: "from-purple-500 to-pink-500",
+    color: "from-purple-500 to-pink-600",
     icon: Globe,
     featured: false,
   },
   {
     id: 4,
-    type: "certification",
-    company: "TESOL International Association",
-    position: "Advanced TESOL Certification",
-    location: "Alexandria, VA",
-    period: "2017",
-    duration: "6 months",
-    description:
-      "Comprehensive certification program covering advanced teaching methodologies, assessment techniques, and technology integration.",
-    achievements: [
-      "Top 5% of certification candidates",
-      "Specialized in Technology-Enhanced Learning",
-      "Completed 120 hours of practicum",
-      "Certified in multiple teaching methodologies",
-    ],
-    technologies: [
-      "TESOL",
-      "Assessment Design",
-      "Technology Integration",
-      "Methodology",
-    ],
-    color: "from-orange-500 to-red-500",
-    icon: Award,
-    featured: false,
-  },
-  {
-    id: 5,
     type: "work",
-    company: "British Council Vietnam",
-    position: "English Instructor",
-    location: "Ho Chi Minh City, Vietnam",
+    company: "Riverside High School",
+    position: "ESL Teacher",
+    location: "Manchester, UK",
     period: "2015 - 2017",
     duration: "2 years",
     description:
-      "Taught English to diverse student groups including children, teenagers, and adults in both group and individual settings.",
+      "Taught English as a Second Language to international students aged 16-18, preparing them for university entrance.",
     achievements: [
       "Managed classes of 15-20 students",
       "Developed cultural exchange programs",
@@ -159,27 +144,35 @@ const experiences = [
 const stats = [
   {
     icon: Users,
-    value: "500+",
+    value: 500,
+    suffix: "+",
     label: "Students Taught",
     description: "Across 25+ countries",
+    color: "from-blue-500 to-purple-600",
   },
   {
     icon: Clock,
-    value: "8+",
+    value: 8,
+    suffix: "+",
     label: "Years Experience",
     description: "In English education",
+    color: "from-purple-500 to-pink-600",
   },
   {
     icon: Star,
-    value: "4.9/5",
+    value: 4.9,
+    suffix: "/5",
     label: "Average Rating",
     description: "From student feedback",
+    color: "from-pink-500 to-red-500",
   },
   {
     icon: Target,
-    value: "98%",
+    value: 98,
+    suffix: "%",
     label: "Success Rate",
     description: "Goal achievement",
+    color: "from-cyan-500 to-blue-500",
   },
 ];
 
@@ -192,35 +185,147 @@ const skills = [
   { name: "Cross-cultural Communication", level: 94, category: "Professional" },
 ];
 
+const certifications = [
+  {
+    name: "CELTA",
+    issuer: "Cambridge Assessment",
+    year: "2018",
+    icon: Award,
+  },
+  {
+    name: "TESOL Master's",
+    issuer: "University of Cambridge",
+    year: "2020",
+    icon: GraduationCap,
+  },
+  {
+    name: "Teaching Excellence Award",
+    issuer: "ILA London",
+    year: "2023",
+    icon: Trophy,
+  },
+];
+
 export default function ExperienceSection() {
   const [activeExperience, setActiveExperience] = useState(experiences[0].id);
-  const [visibleStats, setVisibleStats] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
   const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const skillsRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+
+  const isInView = useInView(sectionRef, { once: true, margin: "-50px" });
+
+  // Fixed positions for particles to avoid hydration mismatch
+  const particlePositions = [
+    { left: 10, top: 15 },
+    { left: 90, top: 25 },
+    { left: 20, top: 80 },
+    { left: 80, top: 10 },
+    { left: 50, top: 90 },
+    { left: 70, top: 60 },
+    { left: 30, top: 40 },
+    { left: 85, top: 70 },
+    { left: 15, top: 55 },
+    { left: 95, top: 85 },
+    { left: 5, top: 35 },
+    { left: 60, top: 20 },
+  ];
 
   useEffect(() => {
-    if (!isInView) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isInView || !isMounted) return;
 
     const ctx = gsap.context(() => {
-      // Timeline animation
+      // Header animation - Fixed: no initial transform that hides content
+      gsap.fromTo(
+        headerRef.current,
+        {
+          opacity: 0,
+          y: 30, // Reduced from large values that hide content
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 90%", // Start earlier so content is visible
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+
+      // Stats counter animation
+      const statElements = statsRef.current?.querySelectorAll(".stat-counter");
+      if (statElements) {
+        statElements.forEach((element, index) => {
+          const stat = stats[index];
+          const counterObj = { value: 0 };
+
+          gsap.fromTo(
+            element,
+            { opacity: 0, y: 20 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              delay: index * 0.1,
+              ease: "power2.out",
+            }
+          );
+
+          gsap.to(counterObj, {
+            value: stat.value,
+            duration: 2,
+            ease: "power2.out",
+            delay: index * 0.1 + 0.5,
+            scrollTrigger: {
+              trigger: statsRef.current,
+              start: "top 80%",
+              toggleActions: "play none none none",
+            },
+            onUpdate: () => {
+              if (element) {
+                const formattedValue =
+                  stat.suffix === "/5"
+                    ? counterObj.value.toFixed(1)
+                    : Math.floor(counterObj.value);
+                element.textContent = formattedValue + stat.suffix;
+              }
+            },
+          });
+        });
+      }
+
+      // Timeline animation - Fixed: reduced initial transforms
       const timelineItems =
         timelineRef.current?.querySelectorAll(".timeline-item");
       if (timelineItems) {
         gsap.fromTo(
           timelineItems,
-          { opacity: 0, x: -50, scale: 0.9 },
+          {
+            opacity: 0,
+            x: -30, // Reduced from -50
+            scale: 0.95, // Reduced from 0.9
+          },
           {
             opacity: 1,
             x: 0,
             scale: 1,
             duration: 0.8,
             ease: "power2.out",
-            stagger: 0.2,
+            stagger: 0.15,
             scrollTrigger: {
               trigger: timelineRef.current,
-              start: "top 80%",
+              start: "top 85%",
+              toggleActions: "play none none reverse",
             },
           }
         );
@@ -237,60 +342,28 @@ export default function ExperienceSection() {
           scrollTrigger: {
             trigger: timelineRef.current,
             start: "top 80%",
+            toggleActions: "play none none reverse",
           },
         }
       );
 
-      // Skills animation
+      // Skills progress bars animation
       const skillBars = skillsRef.current?.querySelectorAll(".skill-progress");
       if (skillBars) {
         skillBars.forEach((bar, index) => {
           const skill = skills[index];
           gsap.fromTo(
             bar,
-            { scaleX: 0 },
+            { width: "0%" },
             {
-              scaleX: skill.level / 100,
+              width: `${skill.level}%`,
               duration: 1.5,
-              delay: index * 0.1,
               ease: "power2.out",
+              delay: index * 0.1,
               scrollTrigger: {
                 trigger: skillsRef.current,
                 start: "top 85%",
-              },
-            }
-          );
-        });
-      }
-
-      // Stats counter animation
-      if (visibleStats) {
-        const statNumbers = document.querySelectorAll(".stat-number");
-        statNumbers.forEach((stat) => {
-          const finalValue = stat.textContent || "0";
-          const numericValue = parseInt(finalValue.replace(/\D/g, ""));
-
-          gsap.fromTo(
-            stat,
-            { textContent: 0 },
-            {
-              textContent: numericValue,
-              duration: 2,
-              ease: "power2.out",
-              snap: { textContent: 1 },
-              onUpdate: function () {
-                const current = Math.round(
-                  gsap.getProperty(this.targets()[0], "textContent") as number
-                );
-                if (finalValue.includes("+")) {
-                  stat.textContent = current + "+";
-                } else if (finalValue.includes("/5")) {
-                  stat.textContent = (current / 10).toFixed(1) + "/5";
-                } else if (finalValue.includes("%")) {
-                  stat.textContent = current + "%";
-                } else {
-                  stat.textContent = current.toString();
-                }
+                toggleActions: "play none none none",
               },
             }
           );
@@ -299,54 +372,102 @@ export default function ExperienceSection() {
 
       // Floating animation for experience cards
       gsap.to(".floating-experience", {
-        y: -5,
-        duration: 2,
+        y: -8,
+        duration: 3,
         ease: "power1.inOut",
         yoyo: true,
         repeat: -1,
-        stagger: 0.3,
+        stagger: 0.5,
+      });
+
+      // Parallax background elements
+      gsap.to(".parallax-bg", {
+        yPercent: -20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+
+      // Magnetic hover effects
+      const magneticElements =
+        sectionRef.current?.querySelectorAll(".magnetic-element");
+      magneticElements?.forEach((element) => {
+        const magnetic = element as HTMLElement;
+
+        magnetic.addEventListener("mouseenter", () => {
+          gsap.to(magnetic, {
+            scale: 1.05,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        });
+
+        magnetic.addEventListener("mouseleave", () => {
+          gsap.to(magnetic, {
+            scale: 1,
+            x: 0,
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        });
+
+        magnetic.addEventListener("mousemove", (e: MouseEvent) => {
+          const rect = magnetic.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          gsap.to(magnetic, {
+            x: x * 0.1,
+            y: y * 0.1,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        });
       });
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [isInView, visibleStats]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisibleStats(true);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    const statsElement = document.querySelector(".stats-container");
-    if (statsElement) {
-      observer.observe(statsElement);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  }, [isInView, isMounted]);
 
   return (
     <section
       ref={sectionRef}
       id="experience"
-      className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900"
+      className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-20 w-96 h-96 rounded-full bg-gradient-to-r from-blue-400/10 to-purple-400/10 blur-3xl" />
-        <div className="absolute bottom-40 left-20 w-80 h-80 rounded-full bg-gradient-to-r from-purple-400/10 to-pink-400/10 blur-3xl" />
+        <div className="parallax-bg absolute top-20 right-20 w-96 h-96 rounded-full bg-gradient-to-r from-blue-400/20 to-purple-400/20 blur-3xl" />
+        <div className="parallax-bg absolute bottom-40 left-20 w-80 h-80 rounded-full bg-gradient-to-r from-purple-400/20 to-pink-400/20 blur-3xl" />
 
-        {/* Animated grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        {/* Floating particles */}
+        {isMounted &&
+          particlePositions.map((position, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-full"
+              style={{
+                left: `${position.left}%`,
+                top: `${position.top}%`,
+                animation: `float ${3 + (i % 3)}s ease-in-out infinite`,
+                animationDelay: `${i * 0.2}s`,
+              }}
+            />
+          ))}
+
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
+          ref={headerRef}
           initial="initial"
           animate={isInView ? "animate" : "initial"}
           variants={staggerChildren}
@@ -354,82 +475,80 @@ export default function ExperienceSection() {
         >
           <motion.div
             variants={fadeInUp}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-8"
+            className="inline-flex items-center px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-blue-200/50 text-blue-600 text-sm font-semibold mb-8 shadow-lg"
           >
-            <TrendingUp className="w-4 h-4 mr-2" />
+            <Briefcase className="w-5 h-5 mr-2" />
             Professional Journey
+            <Sparkles className="w-4 h-4 ml-2" />
           </motion.div>
 
           <motion.h2
             variants={fadeInUp}
-            className="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white mb-8"
+            className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6"
           >
-            My Teaching{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Evolution
+            My{" "}
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Experience
             </span>
           </motion.h2>
 
           <motion.p
             variants={fadeInUp}
-            className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
+            className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
           >
-            8+ years of dedicated experience in English education, from
-            classroom teaching to global corporate training, shaping the future
-            of language learning.
+            8+ years of dedicated teaching experience across international
+            institutions, helping students achieve their English language goals
+            through innovative and personalized learning approaches.
           </motion.p>
         </motion.div>
 
         {/* Stats Section */}
-        <motion.div
-          initial="initial"
-          animate={isInView ? "animate" : "initial"}
-          variants={staggerChildren}
-          className="stats-container grid grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
+        <div
+          ref={statsRef}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
         >
           {stats.map((stat, index) => (
-            <motion.div
+            <div
               key={stat.label}
-              variants={fadeInUp}
-              className="text-center group"
+              className="text-center group magnetic-element"
             >
-              <div className="inline-flex p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-4 group-hover:scale-110 transition-transform duration-300">
-                <stat.icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <div
+                className={cn(
+                  "w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300",
+                  `bg-gradient-to-r ${stat.color}`
+                )}
+              >
+                <stat.icon className="w-10 h-10 text-white" />
               </div>
-              <div className="stat-number text-4xl font-black text-gray-900 dark:text-white mb-2">
-                {stat.value}
+              <div className="stat-counter text-4xl font-bold text-gray-900 mb-2">
+                0{stat.suffix}
               </div>
-              <div className="font-semibold text-gray-900 dark:text-white mb-1">
+              <div className="font-semibold text-gray-600 mb-1">
                 {stat.label}
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {stat.description}
-              </div>
-            </motion.div>
+              <div className="text-sm text-gray-500">{stat.description}</div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Timeline Column */}
           <div className="lg:col-span-2">
-            <motion.h3
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              className="text-3xl font-bold text-gray-900 dark:text-white mb-12"
-            >
+            <h3 className="text-3xl font-bold text-gray-900 mb-12 flex items-center">
+              <Calendar className="w-8 h-8 mr-3 text-blue-500" />
               Professional Timeline
-            </motion.h3>
+            </h3>
 
             <div ref={timelineRef} className="relative">
               {/* Timeline Line */}
-              <div className="timeline-line absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 to-purple-500 origin-top" />
+              <div className="timeline-line absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-purple-500 origin-top rounded-full" />
 
-              <div className="space-y-12">
+              <div className="space-y-8">
                 {experiences.map((exp, index) => (
-                  <motion.div
+                  <div
                     key={exp.id}
                     className={cn(
-                      "timeline-item floating-experience relative pl-20 cursor-pointer transition-all duration-300",
+                      "timeline-item floating-experience relative pl-20 cursor-pointer transition-all duration-300 magnetic-element",
                       activeExperience === exp.id
                         ? "scale-105"
                         : "hover:scale-102"
@@ -439,26 +558,27 @@ export default function ExperienceSection() {
                     {/* Timeline Dot */}
                     <div
                       className={cn(
-                        "absolute left-6 w-4 h-4 rounded-full border-4 border-white dark:border-gray-800 transition-all duration-300",
+                        "absolute left-6 w-6 h-6 rounded-full border-4 border-white transition-all duration-300 shadow-lg",
                         activeExperience === exp.id
-                          ? `bg-gradient-to-r ${exp.color} scale-150 shadow-lg`
-                          : "bg-gray-300 dark:bg-gray-600"
+                          ? `bg-gradient-to-r ${exp.color} scale-125`
+                          : "bg-gray-300"
                       )}
                     />
 
                     {/* Experience Card */}
                     <div
                       className={cn(
-                        "bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl p-8 shadow-lg border transition-all duration-300 relative overflow-hidden",
+                        "bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-lg border transition-all duration-300 relative overflow-hidden",
                         activeExperience === exp.id
-                          ? "border-blue-300 dark:border-blue-600 shadow-2xl shadow-blue-500/20"
-                          : "border-gray-200/50 dark:border-gray-700/50 hover:border-blue-200 dark:hover:border-blue-700"
+                          ? "border-blue-300 shadow-2xl shadow-blue-500/20"
+                          : "border-gray-200/50 hover:border-blue-200"
                       )}
                     >
                       {/* Featured Badge */}
                       {exp.featured && (
                         <div className="absolute top-4 right-4">
-                          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-current" />
                             Current Role
                           </div>
                         </div>
@@ -468,134 +588,177 @@ export default function ExperienceSection() {
                       <div className="flex items-start gap-4 mb-6">
                         <div
                           className={cn(
-                            "p-3 rounded-2xl bg-gradient-to-r",
+                            "p-3 rounded-2xl bg-gradient-to-r shadow-lg",
                             exp.color
                           )}
                         >
-                          <exp.icon className="w-6 h-6 text-white" />
+                          <exp.icon className="w-8 h-8 text-white" />
                         </div>
 
                         <div className="flex-1">
-                          <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                          <h4 className="text-2xl font-bold text-gray-900 mb-1">
                             {exp.position}
                           </h4>
-                          <p className="text-blue-600 dark:text-blue-400 font-semibold mb-2">
+                          <p className="text-blue-600 font-semibold mb-2 flex items-center gap-2">
+                            <Building className="w-4 h-4" />
                             {exp.company}
                           </p>
 
-                          <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
-                            <div className="flex items-center gap-1">
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                            <span className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
                               {exp.location}
-                            </div>
-                            <div className="flex items-center gap-1">
+                            </span>
+                            <span className="flex items-center gap-1">
                               <Calendar className="w-4 h-4" />
                               {exp.period}
-                            </div>
-                            <div className="flex items-center gap-1">
+                            </span>
+                            <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
                               {exp.duration}
-                            </div>
+                            </span>
+                          </div>
+
+                          <p className="text-gray-700 leading-relaxed mb-6">
+                            {exp.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Content Grid */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Achievements */}
+                        <div>
+                          <h5 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <Trophy className="w-5 h-5 text-yellow-500" />
+                            Key Achievements
+                          </h5>
+                          <ul className="space-y-2">
+                            {exp.achievements.map((achievement, idx) => (
+                              <li
+                                key={idx}
+                                className="flex items-start gap-2 text-sm text-gray-600"
+                              >
+                                <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                {achievement}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Technologies */}
+                        <div>
+                          <h5 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <Zap className="w-5 h-5 text-purple-500" />
+                            Expertise Areas
+                          </h5>
+                          <div className="flex flex-wrap gap-2">
+                            {exp.technologies.map((tech, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-xs font-medium"
+                              >
+                                {tech}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       </div>
-
-                      {/* Description */}
-                      <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                        {exp.description}
-                      </p>
-
-                      {/* Achievements */}
-                      <div className="mb-6">
-                        <h5 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          Key Achievements
-                        </h5>
-                        <ul className="space-y-2">
-                          {exp.achievements.map((achievement, idx) => (
-                            <li
-                              key={idx}
-                              className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"
-                            >
-                              <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              {achievement}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Technologies */}
-                      <div>
-                        <h5 className="font-semibold text-gray-900 dark:text-white mb-3">
-                          Expertise Areas
-                        </h5>
-                        <div className="flex flex-wrap gap-2">
-                          {exp.technologies.map((tech, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs font-medium"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Skills Sidebar */}
-          <div className="lg:col-span-1">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-              transition={{ delay: 0.5 }}
-              className="sticky top-8"
+          {/* Skills & Certifications Sidebar */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Skills */}
+            <div
+              ref={skillsRef}
+              className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/20"
             >
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-blue-500" />
                 Core Skills
               </h3>
 
-              <div ref={skillsRef} className="space-y-8">
+              <div className="space-y-6">
                 {skills.map((skill, index) => (
                   <div key={skill.name}>
-                    <div className="flex justify-between items-center mb-3">
-                      <div>
-                        <span className="font-semibold text-gray-900 dark:text-white">
-                          {skill.name}
-                        </span>
-                        <span className="block text-xs text-blue-600 dark:text-blue-400 font-medium">
-                          {skill.category}
-                        </span>
-                      </div>
-                      <span className="text-lg font-bold text-gray-900 dark:text-white">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-semibold text-gray-700">
+                        {skill.name}
+                      </span>
+                      <span className="text-sm font-bold text-blue-600">
                         {skill.level}%
                       </span>
                     </div>
+                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="skill-progress h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-300"
+                        style={{ width: "0%" }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-500 capitalize">
+                      {skill.category}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                      <div className="skill-progress h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full origin-left transform scale-x-0" />
+            {/* Certifications */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/20">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Award className="w-6 h-6 text-yellow-500" />
+                Certifications
+              </h3>
+
+              <div className="space-y-4">
+                {certifications.map((cert, index) => (
+                  <div
+                    key={cert.name}
+                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl magnetic-element hover:shadow-md transition-all duration-300"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                      <cert.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900">
+                        {cert.name}
+                      </h4>
+                      <p className="text-sm text-gray-600">{cert.issuer}</p>
+                      <span className="text-xs text-blue-600 font-medium">
+                        {cert.year}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Download CV Button */}
-              <motion.button
-                className="w-full mt-12 px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold flex items-center justify-center gap-2 hover:shadow-lg transition-all duration-300"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <ExternalLink className="w-5 h-5" />
+              <button className="w-full mt-6 py-3 px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 magnetic-element">
+                <Download className="w-5 h-5" />
                 Download CV
-              </motion.button>
-            </motion.div>
+                <ExternalLink className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Custom animation keyframes */}
+      <style jsx>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
     </section>
   );
 }
